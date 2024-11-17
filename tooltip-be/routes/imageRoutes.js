@@ -1,7 +1,7 @@
 // backend/routes/imageRoutes.js
 const express = require('express');
 const multer = require('multer');
-const { uploadImage, addTooltip, getImageWithTooltips, getAllImages, updateImageDetails, updateImageFinishDetail, updateTooltipPosition } = require('../controllers/imageController');
+const { uploadImage, addTooltip, getImageWithTooltips, getAllImages, updateImageDetails, updateImageFinishDetail, updateTooltipPosition, deleteImage, deleteMultipleImages } = require('../controllers/imageController');
 
 const upload = multer({
     dest: 'uploads/',
@@ -17,5 +17,9 @@ router.get('/', getAllImages);
 router.put('/:imageId/details', updateImageDetails);
 router.put('/:imageId/finish', updateImageFinishDetail);
 router.put('/tooltips/:tooltipId', updateTooltipPosition);
+// Add these new routes
+router.delete('/delete/:imageId', deleteImage);
+router.delete('/bulk-delete', deleteMultipleImages);
+
 
 module.exports = router;

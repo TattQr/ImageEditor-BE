@@ -138,3 +138,82 @@ exports.updateTooltipPosition = async (req, res) => {
 
     res.json({ message: "Tooltip position updated", tooltip: image.tooltips.id(tooltipId) });
 };
+
+
+// Delete single image
+exports.deleteImage = async (req, res) => {
+    try {
+        const { imageId } = req.params;
+        
+        // Get image details from database
+        const image = await Image.findById(imageId);
+        if (!image) {
+            return res.status(404).json({ message: "Image not found" });
+        }
+
+        // Delete main image file
+        const mainImagePath = `.${image.url}`;
+        if (fs.existsSync(mainImagePath)) {
+            fs.unlinkSync(mainImagePath);
+        }
+
+        // Delete associated tooltip images if they exist
+        image.tooltips.forEach(tooltip => {
+            if (tooltip.innerImage) {
+                const tooltipImagePath = `.${tooltip.innerImage}`;
+                if (fs.existsSync(tooltipImagePath)) {
+                    fs.unlinkSync(tooltipImagePath);
+                }
+            }
+        });
+
+        // Delete from database
+        await Image.findByIdAndDelete(imageId);
+
+        res.json({ message: "Image and associated files deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting image", error: error.message });
+    }
+};
+
+// Delete multiple images
+exports.deleteMultipleImages = async (req, res) => {
+    try {
+        const { imageIds } = req.body;
+
+        if (!Array.isArray(imageIds)) {
+            return res.status(400).json({ message: "imageIds must be an array" });
+        }
+
+        // Get all images
+        const images = await Image.find({ _id: { $in: imageIds } });
+
+        // Delete all files
+        images.forEach(image => {
+            // Delete main image
+            const mainImagePath = `.${image.url}`;
+            if (fs.existsSync(mainImagePath)) {
+                fs.unlinkSync(mainImagePath);
+            }
+
+            // Delete tooltip images
+            image.tooltips.forEach(tooltip => {
+                if (tooltip.innerImage) {
+                    const tooltipImagePath = `.${tooltip.innerImage}`;
+                    if (fs.existsSync(tooltipImagePath)) {
+                        fs.unlinkSync(tooltipImagePath);
+                    }
+                }
+            });
+        });
+
+        // Delete from database
+        await Image.deleteMany({ _id: { $in: imageIds } });
+
+        res.json({ 
+            message: `Successfully deleted ${images.length} images and their associated files` 
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting images", error: error.message });
+    }
+};

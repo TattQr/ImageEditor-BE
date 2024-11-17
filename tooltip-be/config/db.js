@@ -1,11 +1,13 @@
 // backend/config/db.js
+require('dotenv').config();
 const mongoose = require('mongoose');
+const connectionString = process.env.MONGODB_URI;
 
 const connectDB = async () => {
     try {
-        await mongoose.connect('mongodb+srv://tareen544:tareen544@cluster0.tzmts.mongodb.net/tooltipDB', {
+        await mongoose.connect(connectionString, {
         });
-        console.log('MongoDB connected');
+        console.log('MongoDB connected successfully');
     } catch (error) {
         console.error('Error connecting to MongoDB:', error);
         process.exit(1);

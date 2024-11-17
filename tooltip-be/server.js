@@ -16,10 +16,13 @@
 
 // app.listen(3001, () => console.log('Server running on http://localhost:3001'));
 
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const imageRoutes = require('./routes/imageRoutes');
+const authRoutes = require('./routes/authRoutes')
+const Port = process.env.PORT || 8080;
 
 const app = express();
 
@@ -46,6 +49,8 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ message: 'Backend is running' });
 });
 
+
+app.use('/api/auth', authRoutes )
 app.use('/api/images', imageRoutes);
 
-app.listen(3001, () => console.log('Server running on http://localhost:3001'));
+app.listen(Port, () => console.log(`Server is running on ${Port}`));
