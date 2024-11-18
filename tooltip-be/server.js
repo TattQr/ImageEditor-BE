@@ -19,6 +19,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 const imageRoutes = require('./routes/imageRoutes');
 const authRoutes = require('./routes/authRoutes')
@@ -40,7 +41,9 @@ app.use(express.urlencoded({
     parameterLimit: 100000,
     extended: true
 }));
-app.use('/uploads', express.static('uploads'));
+// app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 connectDB();
 
