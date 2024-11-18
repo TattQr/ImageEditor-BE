@@ -15,7 +15,7 @@ router.post('/upload',auth, upload.single('image'), uploadImage);
 router.post('/tooltip', addTooltip);
 router.get('/:imageId', getImageWithTooltips);
 router.get('/',auth, getAllImages);
-router.put('/:imageId/details', updateImageDetails);
+router.put('/:imageId/details',auth, updateImageDetails);
 router.put('/:imageId/finish', updateImageFinishDetail);
 router.put('/tooltips/:tooltipId', updateTooltipPosition);
 // Add these new routes
