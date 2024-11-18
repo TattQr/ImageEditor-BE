@@ -8,7 +8,7 @@ exports.uploadImage = async (req, res) => {
     // console.log("req.file", req.file);
     
     const imageUrl = `/uploads/${req.file.filename}`;
-    const image = new Image({ url: imageUrl, tooltips: [] });
+    const image = new Image({ url: imageUrl, tooltips: [], userId: req.user._id });
     await image.save();
     res.json({ image });
 };
@@ -51,13 +51,34 @@ exports.uploadImage = async (req, res) => {
 // };
 
 // New controller method for updating image details
+// exports.updateImageDetails = async (req, res) => {
+//     const { imageId } = req.params;
+//     const { projectName, stylePreferences } = req.body;
+
+//     const image = await Image.findById(imageId);
+//     if (!image) {
+//         return res.status(404).json({ message: "Image not found" });
+//     }
+
+//     image.projectName = projectName;
+//     image.iconStyle = stylePreferences.iconStyle;
+//     image.size = stylePreferences.size;
+//     image.color = stylePreferences.color;
+
+//     await image.save();
+//     res.json({ image });
+// };
 exports.updateImageDetails = async (req, res) => {
     const { imageId } = req.params;
     const { projectName, stylePreferences } = req.body;
 
-    const image = await Image.findById(imageId);
+    const image = await Image.findOne({ 
+        _id: imageId,
+        userId: req.user._id  // Verify user owns the image
+    });
+    
     if (!image) {
-        return res.status(404).json({ message: "Image not found" });
+        return res.status(404).json({ message: "Image not found or unauthorized" });
     }
 
     image.projectName = projectName;
@@ -115,12 +136,18 @@ exports.getImageWithTooltips = async (req, res) => {
     res.json({ image });
 };
 
+// exports.getAllImages = async (req, res) => {
+//     // const images = await Image.find();
+//     const images = await Image.find().populate('tooltips').sort({ _id: -1 });
+//     res.json({ images });
+// };
+
 exports.getAllImages = async (req, res) => {
-    // const images = await Image.find();
-    const images = await Image.find().populate('tooltips').sort({ _id: -1 });
+    const images = await Image.find({ userId: req.user._id })
+        .populate('tooltips')
+        .sort({ _id: -1 });
     res.json({ images });
 };
-
 
 exports.updateTooltipPosition = async (req, res) => {
     const { tooltipId } = req.params;
@@ -146,7 +173,11 @@ exports.deleteImage = async (req, res) => {
         const { imageId } = req.params;
         
         // Get image details from database
-        const image = await Image.findById(imageId);
+        const image = await Image.findOne({ 
+            _id: imageId,
+            userId: req.user._id
+        });
+        // const image = await Image.findById(imageId);
         if (!image) {
             return res.status(404).json({ message: "Image not found" });
         }
@@ -186,7 +217,11 @@ exports.deleteMultipleImages = async (req, res) => {
         }
 
         // Get all images
-        const images = await Image.find({ _id: { $in: imageIds } });
+        const images = await Image.find({ 
+            _id: { $in: imageIds },
+            userId: req.user._id
+        });
+        // const images = await Image.find({ _id: { $in: imageIds } });
 
         // Delete all files
         images.forEach(image => {

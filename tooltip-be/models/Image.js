@@ -24,6 +24,11 @@ const ImageSchema = new mongoose.Schema({
     color: String, 
     finished: Boolean,
     tooltips: [TooltipSchema],
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 });
 
 module.exports = mongoose.model('Image', ImageSchema);

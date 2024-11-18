@@ -2,6 +2,7 @@
 const express = require('express');
 const multer = require('multer');
 const { uploadImage, addTooltip, getImageWithTooltips, getAllImages, updateImageDetails, updateImageFinishDetail, updateTooltipPosition, deleteImage, deleteMultipleImages } = require('../controllers/imageController');
+const auth = require('../middleware/auth');
 
 const upload = multer({
     dest: 'uploads/',
@@ -10,16 +11,16 @@ const upload = multer({
 
 const router = express.Router();
 
-router.post('/upload', upload.single('image'), uploadImage);
+router.post('/upload',auth, upload.single('image'), uploadImage);
 router.post('/tooltip', addTooltip);
 router.get('/:imageId', getImageWithTooltips);
-router.get('/', getAllImages);
+router.get('/',auth, getAllImages);
 router.put('/:imageId/details', updateImageDetails);
 router.put('/:imageId/finish', updateImageFinishDetail);
 router.put('/tooltips/:tooltipId', updateTooltipPosition);
 // Add these new routes
-router.delete('/delete/:imageId', deleteImage);
-router.delete('/bulk-delete', deleteMultipleImages);
+router.delete('/delete/:imageId',auth, deleteImage);
+router.delete('/bulk-delete',auth, deleteMultipleImages);
 
 
 module.exports = router;
