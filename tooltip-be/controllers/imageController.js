@@ -9,7 +9,8 @@ exports.uploadImage = async (req, res) => {
     // console.log("req.file", req.file);
     
     const imageUrl = `/uploads/${req.file.filename}`;
-    const image = new Image({ url: imageUrl, tooltips: [], userId: req.user._id });
+
+    const image = new Image({ url: imageUrl ? `https://keen-energy-production.up.railway.app${imageUrl}`: null, tooltips: [], userId: req.user._id });
     await image.save();
     res.json({ image });
 };
