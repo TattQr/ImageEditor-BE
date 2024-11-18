@@ -6,8 +6,8 @@ const fs = require('fs');
 
 exports.uploadImage = async (req, res) => {
     // console.log("req.file", req.file);
-    
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    // const imageUrl = `/uploads/${req.file.filename}`;
     const image = new Image({ url: imageUrl, tooltips: [], userId: req.user._id });
     await image.save();
     res.json({ image });

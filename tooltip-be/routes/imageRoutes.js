@@ -3,11 +3,24 @@ const express = require('express');
 const multer = require('multer');
 const { uploadImage, addTooltip, getImageWithTooltips, getAllImages, updateImageDetails, updateImageFinishDetail, updateTooltipPosition, deleteImage, deleteMultipleImages } = require('../controllers/imageController');
 const auth = require('../middleware/auth');
+const path = require('path');
 
-const upload = multer({
-    dest: 'uploads/',
-    limits: { fileSize: 50 * 1024 * 1024 } // Limit file size to 5 MB, adjust as needed
+const storage = multer.diskStorage({
+    destination: 'uploads/',
+    limit: { fileSize: 50 * 1024 * 1024 },
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+    },
 });
+
+const upload = multer({ storage });
+
+// const upload = multer({
+//     dest: 'uploads/',
+//     limits: { fileSize: 50 * 1024 * 1024 } // Limit file size to 5 MB, adjust as needed
+// });
+
+
 
 const router = express.Router();
 
